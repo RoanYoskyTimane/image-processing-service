@@ -9,3 +9,10 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
+
+cloudflare:
+  r2:
+    endpoint: ${CLOUDFLARE_ENDPOINT}
+    access-key: ${CLOUDFLARE_ACCESS_KEY}
+    secret-key: ${CLOUDFLARE_SECRET_KEY}
+    bucket-name: ${CLOUDFLARE_BUCKET_NAME}
