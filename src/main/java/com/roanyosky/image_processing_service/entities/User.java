@@ -25,8 +25,10 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)
     private String password;
 
-    public Collection<? extends GrantedAuthority> getAuthorities(){
-        return List.of(null);
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Return an empty list instead of List.of(null)
+        return List.of();
     }
 
     @Override
