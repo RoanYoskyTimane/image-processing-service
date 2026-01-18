@@ -1,4 +1,4 @@
-package com.roanyosky.image_processing_service.config;
+package com.roanyosky.image_processing_service.config.cloudflareR2;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
