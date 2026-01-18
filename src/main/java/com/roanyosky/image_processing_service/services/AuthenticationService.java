@@ -8,6 +8,8 @@ import com.roanyosky.image_processing_service.entities.User;
 import com.roanyosky.image_processing_service.mappers.UserMapper;
 import com.roanyosky.image_processing_service.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-
+    private final AuthenticationManager authenticationManager;
     public AuthenticationResponseDto register(UserCreateDto userCreateDto){
         //Creates a user
         User user = userMapper.toEntity(userCreateDto);
@@ -37,7 +39,10 @@ public class AuthenticationService {
 
 
     public AuthenticationResponseDto autheticate(LoginDto loginDto){
-        User user = userRepository.findByUsername(loginDto.getUsername());
+        // This will throw an exception if the password/username is wrong
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+
+        User user = userRepository.findByUsername(loginDto.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
 
         //Gererate the token
         String jwtToken = jwtService.generateToken(user);
