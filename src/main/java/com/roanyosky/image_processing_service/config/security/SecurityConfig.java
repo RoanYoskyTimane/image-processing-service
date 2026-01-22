@@ -1,6 +1,6 @@
 package com.roanyosky.image_processing_service.config.security;
 
-import com.roanyosky.image_processing_service.services.JwtAuthenticationFilter;
+import com.roanyosky.image_processing_service.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
