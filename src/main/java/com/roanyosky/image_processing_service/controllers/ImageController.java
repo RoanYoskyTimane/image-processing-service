@@ -7,13 +7,14 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.jpeg.JpegDirectory;
 import com.drew.metadata.png.PngDirectory;
-import com.roanyosky.image_processing_service.dtos.ImageCreateDto;
-import com.roanyosky.image_processing_service.dtos.ImageDto;
+import com.roanyosky.image_processing_service.dtos.*;
 import com.roanyosky.image_processing_service.entities.User;
+import com.roanyosky.image_processing_service.filters.SepiaFilter;
 import com.roanyosky.image_processing_service.repositories.ImageRepository;
 import com.roanyosky.image_processing_service.services.ImageService;
 import com.roanyosky.image_processing_service.services.R2Service;
 import lombok.AllArgsConstructor;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 @RestController
 @AllArgsConstructor
@@ -105,4 +105,71 @@ public class ImageController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"")
                 .body(data);
     }
+
+    @PostMapping("/{key}/transform")
+    public ResponseEntity<?> transformImage(@PathVariable String key, @RequestBody TransformRequest transformRequest){
+        try{
+            //Extract the Transform Object Dto
+            TransformDto transformDto = transformRequest.getTransformations();
+
+            //1. Gets the original image from R2
+            byte[] data = r2Service.getFile(key);
+
+            //2. Prepares the input and output streams
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            //3. Start of Thumbnailator pipeline
+            // The size() is a starting point;
+            var builder = Thumbnails.of(inputStream);
+
+
+            //AResize
+            if (transformDto.getResize() != null){
+                System.out.println("The width"+transformDto.getResize().getWidth());
+                System.out.println("The height:"+transformDto.getResize().getHeight());
+                builder.size(transformDto.getResize().getWidth(),transformDto.getResize().getHeight());
+            }
+            else{
+                builder.scale(1.0);
+            }
+
+            //Cropping
+            if(transformDto.getCrop() != null){
+                CropDto crop = transformDto.getCrop();
+                builder.sourceRegion(crop.getX(), crop.getY(), crop.getWidth(), crop.getHeight());
+            }
+
+            //Rotation
+            if (transformDto.getRotate() != null){
+                builder.rotate(transformDto.getRotate());
+            }
+
+            //Filters
+            if (transformDto.getFilters() != null){
+                if (Boolean.TRUE.equals(transformDto.getFilters().getGrayscale())) {
+                    builder.imageType(BufferedImage.TYPE_BYTE_GRAY);
+                }
+                if (Boolean.TRUE.equals(transformDto.getFilters().getSepia())) {
+                    builder.addFilter(new SepiaFilter());
+                }
+            }
+
+            //Set output format
+            String outputFormat = (transformDto.getFormat() != null) ? transformDto.getFormat() : "jpg";
+            builder.outputFormat(outputFormat);
+
+            //4. Perfoms the transformation
+            builder.toOutputStream(outputStream);
+            byte[] resultBytes = outputStream.toByteArray();
+
+            //5. Returns the processed image
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("image/" + outputFormat))
+                    .body(resultBytes);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Transformation failed: " + e.getMessage());
+        }
+    }
+
 }
