@@ -1,12 +1,15 @@
 package com.roanyosky.image_processing_service.dtos;
 
-import lombok.Builder;
+import lombok.*;
 
+@Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransformDto {
-    ResizeDto resizeDto;
-    CropDto cropDto;
+    ResizeDto resize;
+    CropDto crop;
     Integer rotate;
     String format;
-    FiltersDto filtersDto;
+    FiltersDto filters;
 }
