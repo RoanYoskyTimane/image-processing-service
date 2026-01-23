@@ -14,6 +14,9 @@ import com.roanyosky.image_processing_service.mappers.ImageMapper;
 import com.roanyosky.image_processing_service.repositories.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -160,4 +163,14 @@ public class ImageService {
         }
     }
 
+    public Page<ImageDto> getAllImagesPaginated(int page, int size){
+        //Creates a PageRequest object (page index, size)
+        Pageable pageable = PageRequest.of(page,size);
+
+        //Fetch the paginated data from Database
+        Page<Image> imagePage = imageRepository.findAll(pageable);
+
+        //Map the page of entities to a Page of Dtos
+        return imagePage.map(imageMapper::toDto);
+    }
 }
