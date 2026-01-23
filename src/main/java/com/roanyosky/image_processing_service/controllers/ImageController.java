@@ -15,6 +15,7 @@ import com.roanyosky.image_processing_service.services.ImageService;
 import com.roanyosky.image_processing_service.services.R2Service;
 import lombok.AllArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -90,6 +92,15 @@ public class ImageController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("image/" + processedImage.getFormat()))
                 .body(processedImage.getImageData());
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ImageDto>> getImages(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int limit
+    ){
+        Page<ImageDto> images = imageService.getAllImagesPaginated(page, limit);
+        return ResponseEntity.ok(images);
     }
 
 }
