@@ -163,12 +163,12 @@ public class ImageService {
         }
     }
 
-    public Page<ImageDto> getAllImagesPaginated(int page, int size){
+    public Page<ImageDto> getAllImagesPaginated(int page, int size, Integer userId){
         //Creates a PageRequest object (page index, size)
         Pageable pageable = PageRequest.of(page,size);
 
         //Fetch the paginated data from Database
-        Page<Image> imagePage = imageRepository.findAll(pageable);
+        Page<Image> imagePage = imageRepository.findImageByOwnerId(userId, pageable);
 
         //Map the page of entities to a Page of Dtos
         return imagePage.map(imageMapper::toDto);
