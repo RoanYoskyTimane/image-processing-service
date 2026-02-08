@@ -8,6 +8,7 @@ import java.util.UUID;
 public class ImageDto {
     private UUID id;
     private Integer owner_id;
+    private String r2Key;
     private String originalName;
     private String contentType;
     private Integer height;
