@@ -10,4 +10,6 @@ import java.util.UUID;
 
 public interface ImageRepository extends JpaRepository<Image, UUID> {
     Page<Image> findImageByOwnerId(Integer ownerId, Pageable pageable);
+
+    Image findImageByR2KeyAndOwnerId(String key, Integer userId);
 }
