@@ -173,4 +173,10 @@ public class ImageService {
         //Map the page of entities to a Page of Dtos
         return imagePage.map(imageMapper::toDto);
     }
+
+    public void deleteImage(String key, Integer userId)
+    {
+        Image imageToDelete = imageRepository.findImageByR2KeyAndOwnerId(key, userId);
+        imageRepository.delete(imageToDelete);
+    }
 }
