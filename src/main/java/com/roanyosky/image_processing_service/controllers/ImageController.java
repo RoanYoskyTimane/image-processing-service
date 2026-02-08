@@ -1,29 +1,19 @@
 package com.roanyosky.image_processing_service.controllers;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
-import com.drew.metadata.jpeg.JpegDirectory;
-import com.drew.metadata.png.PngDirectory;
+
 import com.roanyosky.image_processing_service.dtos.*;
 import com.roanyosky.image_processing_service.entities.User;
-import com.roanyosky.image_processing_service.filters.SepiaFilter;
-import com.roanyosky.image_processing_service.repositories.ImageRepository;
 import com.roanyosky.image_processing_service.services.ImageService;
 import com.roanyosky.image_processing_service.services.R2Service;
 import com.roanyosky.image_processing_service.services.RateLimiteService;
 import io.github.bucket4j.Bucket;
 import lombok.AllArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -110,9 +100,10 @@ public class ImageController {
     @GetMapping
     public ResponseEntity<Page<ImageDto>> getImages(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int limit
+        @RequestParam(defaultValue = "10") int limit,
+        @AuthenticationPrincipal User autheticatedUser
     ){
-        Page<ImageDto> images = imageService.getAllImagesPaginated(page, limit);
+        Page<ImageDto> images = imageService.getAllImagesPaginated(page, limit, autheticatedUser.getId());
         return ResponseEntity.ok(images);
     }
 
