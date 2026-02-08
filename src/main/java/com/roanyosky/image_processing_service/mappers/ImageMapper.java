@@ -16,6 +16,7 @@ public interface ImageMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner.id", source = "owner_id")
+    @Mapping(target = "r2Key", source = "r2Key")
     Image toEntity(ImageCreateDto imageCreateDto);
 
     void updateDto(ImageUpdateDto imageUpdateDto, @MappingTarget Image image);
